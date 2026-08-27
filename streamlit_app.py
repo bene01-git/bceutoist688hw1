@@ -1,6 +1,6 @@
 import streamlit as st
 from openai import OpenAI
-import pypdf
+from pypdf import PdfReader
 
 # Show title and description.
 st.title("IST688 HW 1 bceuto")
@@ -18,8 +18,11 @@ def validate_api_key(api_key):
         return False
 
 def read_pdf(pdf_file):
-    pdf = pypdf.PdfReader(pdf_file)
-
+    pdf = PdfReader(pdf_file)
+    text = ""
+    for page in pdf.pages:
+        text += page.extract_text() + "\n"
+    return text
 
 
 # Ask user for their OpenAI API key via `st.text_input`.
@@ -37,7 +40,7 @@ else:
 
     # Let the user upload a file via `st.file_uploader`.
     uploaded_file = st.file_uploader(
-        "Upload a document (.txt or .md)", type=("txt", "md")
+        "Upload a document (.txt or .pdf)", type=("txt", "pdf")
     )
 
     # Ask the user for a question via `st.text_area`.
@@ -49,15 +52,6 @@ else:
 
     if uploaded_file and question:
 
-        # Process the uploaded file and question.
-        document = uploaded_file.read().decode()
-        messages = [
-            {
-                "role": "user",
-                "content": f"Here's a document: {document} \n\n---\n\n {question}",
-            }
-        ]
-
         file_extension = uploaded_file.name.split('.')[-1]
         if file_extension == 'txt':
             document = uploaded_file.read().decode()
@@ -66,12 +60,22 @@ else:
         else:
             st.error("Unsupported file type.")
 
-        # Generate an answer using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-5-nano",
-            messages=messages,
-            stream=True,
-        )
+        # Process the uploaded file and question.
+        if document:
+            messages = [
+                {
+                    "role": "user",
+                    "content": f"Here's a document: {document} \n\n---\n\n {question}",
+                }
+            ]
 
-        # Stream the response to the app using `st.write_stream`.
-        st.write_stream(stream)
+
+            # Generate an answer using the OpenAI API.
+            stream = client.chat.completions.create(
+                model="gpt-5",
+                messages=messages,
+                stream=True,
+            )
+
+            # Stream the response to the app using `st.write_stream`.
+            st.write_stream(stream)
