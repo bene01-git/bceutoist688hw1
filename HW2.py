@@ -18,14 +18,12 @@ prompt = "Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summa
 
 llm_option = st.sidebar.selectbox(
     'Choose LLM',
-    ("OpenAI", "Claude"),
-    key=1
+    ("OpenAI", "Claude")
 )
 
 summary_option = st.sidebar.selectbox(
     'Choose a summary format',
-    ("100 words", "2 connecting paragraphs", "5 bullet points"),
-    key=2
+    ("100 words", "2 connecting paragraphs", "5 bullet points")
 )
 
 lang_widget = st.radio("What language do you prefer?", ['English', 'Spanish', 'French', 'Japanese'])
@@ -40,12 +38,12 @@ else:
    language = "Japanese"
 
 if st.sidebar.checkbox("Use advanced model"):
-    if st.sidebar.checkbox("OpenAI"):
+    if st.sidebar.checkbox("OpenAI",key="advanced"):
         selected_model = "gpt-5.4-mini"
     else:
         selected_model = "claude-sonnet-5"
 else:
-    if st.sidebar.checkbox("OpenAI"):
+    if st.sidebar.checkbox("OpenAI", key="basic"):
         selected_model = "gpt-5.4-nano"
     else:
         selected_model = "claude-haiku-4-5-20251001"
