@@ -3,6 +3,8 @@ from openai import OpenAI
 import time
 import logging
 import anthropic
+import requests
+from bs4 import BeautifulSoup
 
 # Show title and description.
 st.title("HW 2")
@@ -21,6 +23,21 @@ llm_option = st.sidebar.selectbox(
     ("OpenAI", "Claude")
 )
 
+# 1. Define the UI elements once
+use_advanced = st.sidebar.checkbox("Use advanced model")
+use_openai = st.sidebar.checkbox("OpenAI")
+
+if use_advanced:
+    if use_openai:
+        selected_model = "gpt-5.4-mini"
+    else:
+        selected_model = "claude-sonnet-5"
+else:
+    if use_openai:
+        selected_model = "gpt-5.4-nano"
+    else:
+        selected_model = "claude-haiku-4-5-20251001"
+
 summary_option = st.sidebar.selectbox(
     'Choose a summary format',
     ("100 words", "2 connecting paragraphs", "5 bullet points")
@@ -38,18 +55,16 @@ else:
    language = "Japanese"
 
 if st.sidebar.checkbox("Use advanced model"):
-    if st.sidebar.checkbox("OpenAI",key="advanced"):
+    if llm_option == "OpenAI":
         selected_model = "gpt-5.4-mini"
     else:
         selected_model = "claude-sonnet-5"
 else:
-    if st.sidebar.checkbox("OpenAI", key="basic"):
+    if llm_option == "OpenAI":
         selected_model = "gpt-5.4-nano"
     else:
         selected_model = "claude-haiku-4-5-20251001"
 
-import requests
-from bs4 import BeautifulSoup
 def read_url_content(url):
  try:
     response = requests.get(url)
@@ -66,7 +81,7 @@ def read_url_content(url):
 openai_api_key = st.secrets.OPENAI_API_KEY
 anthropic_api_key = st.secrets.ANTHROPIC_API_KEY
 
-if st.sidebar.checkbox("OpenAI"):
+if llm_option == "OpenAI":
     client = OpenAI(api_key=openai_api_key)
 else:
     client = anthropic.Anthropic(api_key=anthropic_api_key)
@@ -78,7 +93,7 @@ if uploaded_url:
     url = read_url_content(uploaded_url)
     st.write(f"Generating summary using: **{selected_model}**...")
 
-    if st.sidebar.checkbox("OpenAI"):
+    if llm_option == "OpenAI":
         messages = [
                 {
                 "role": "user",
