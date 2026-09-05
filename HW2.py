@@ -47,9 +47,6 @@ else:
     else:
         selected_model = "claude-haiku-4-5-20251001"
 
-# Prompt for all LLMs
-prompt = f"Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
-
 def read_url_content(url):
  try:
     response = requests.get(url)
@@ -76,6 +73,8 @@ uploaded_url = st.text_input("URL", type="url")
 
 if uploaded_url:
     url = read_url_content(uploaded_url)
+    # Prompt for all LLMs
+    prompt = f"Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
     st.write(f"Generating summary using: **{selected_model}**...")
 
     if llm_option == "OpenAI":
