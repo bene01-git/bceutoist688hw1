@@ -18,12 +18,14 @@ prompt = "Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summa
 
 llm_option = st.sidebar.selectbox(
     'Choose LLM',
-    ("OpenAI", "Claude")
+    ("OpenAI", "Claude"),
+    key=1
 )
 
 summary_option = st.sidebar.selectbox(
     'Choose a summary format',
-    ("100 words", "2 connecting paragraphs", "5 bullet points")
+    ("100 words", "2 connecting paragraphs", "5 bullet points"),
+    key=2
 )
 
 lang_widget = st.radio("What language do you prefer?", ['English', 'Spanish', 'French', 'Japanese'])
