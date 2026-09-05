@@ -1,8 +1,25 @@
 import streamlit as st
 from openai import OpenAI
+import time
+import logging
+import anthropic
 
 # Show title and description.
 st.title("HW 2")
+
+# Configures logging
+logging.basicConfig(level=logging.INFO)
+
+# System message for both LLMs
+system_message = "You are a helpful assistant."
+
+# Prompt for all LLMs
+prompt = "Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
+
+llm_option = st.sidebar.selectbox(
+    'Choose LLM',
+    ("OpenAI", "Claude")
+)
 
 summary_option = st.sidebar.selectbox(
     'Choose a summary format',
@@ -20,23 +37,16 @@ elif lang_widget == "French":
 else:
    language = "Japanese"
 
-import time
-import logging
-import anthropic
-
-# Configures logging
-logging.basicConfig(level=logging.INFO)
-
-# System message for both LLMs
-system_message = "You are a helpful assistant."
-
-# Prompt for all LLMs
-prompt = "Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
-
 if st.sidebar.checkbox("Use advanced model"):
-    selected_model = "gpt-5.4-mini" 
+    if st.sidebar.checkbox("OpenAI"):
+        selected_model = "gpt-5.4-mini"
+    else:
+        selected_model = "claude-sonnet-5"
 else:
-    selected_model = "gpt-5.4-nano"
+    if st.sidebar.checkbox("OpenAI"):
+        selected_model = "gpt-5.4-nano"
+    else:
+        selected_model = "claude-haiku-4-5-20251001"
 
 import requests
 from bs4 import BeautifulSoup
@@ -54,31 +64,49 @@ def read_url_content(url):
 # Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
 # via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
 openai_api_key = st.secrets.OPENAI_API_KEY
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-else:
+anthropic_api_key = st.secrets.ANTHROPIC_API_KEY
 
-    # Create an OpenAI client.
+if st.sidebar.checkbox("OpenAI"):
     client = OpenAI(api_key=openai_api_key)
+else:
+    client = anthropic.Anthropic(api_key=anthropic_api_key)
 
-    # Let the user upload a file via `st.file_uploader`.
-    uploaded_url = st.text_input("OpenAI API Key", type="url")
+# Let the user upload a file via `st.file_uploader`.
+uploaded_url = st.text_input("URL", type="url")
 
-    if uploaded_url:
-        url = read_url_content(uploaded_url)
+if uploaded_url:
+    url = read_url_content(uploaded_url)
+    st.write(f"Generating summary using: **{selected_model}**...")
+
+    if st.sidebar.checkbox("OpenAI"):
         messages = [
-            {
+                {
                 "role": "user",
-                "content": f""{prompt}"",
+                "content": f""{prompt}""
             }
         ]
-
-        st.write(f"Generating summary using: **{selected_model}**...")
 
         stream = client.chat.completions.create(
             model=selected_model,
             messages=messages,
-            stream=True,
+            stream=True
         )
+
         st.write_stream(stream)
         st.write(stream)
+    else:
+        message_to_llm = [
+                {
+                "role": "user",
+                "content": [{'type': 'text', 'text': prompt}]
+            }
+        ]
+
+        message = client.messages.create(
+            model=selected_model,
+            system=system_message,
+            messages=message_to_llm
+        )
+        
+        data = message.content[0].text
+        st.write(data)
