@@ -82,7 +82,7 @@ if uploaded_url:
         messages = [
                 {
                 "role": "user",
-                "content": f""{prompt}""
+                "content": prompt
             }
         ]
 
@@ -107,6 +107,6 @@ if uploaded_url:
             system=system_message,
             messages=message_to_llm
         )
-        
+
         data = message.content[0].text
         st.write(data)
