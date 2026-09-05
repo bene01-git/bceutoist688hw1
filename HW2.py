@@ -23,21 +23,6 @@ llm_option = st.sidebar.selectbox(
     ("OpenAI", "Claude")
 )
 
-# 1. Define the UI elements once
-use_advanced = st.sidebar.checkbox("Use advanced model")
-use_openai = st.sidebar.checkbox("OpenAI")
-
-if use_advanced:
-    if use_openai:
-        selected_model = "gpt-5.4-mini"
-    else:
-        selected_model = "claude-sonnet-5"
-else:
-    if use_openai:
-        selected_model = "gpt-5.4-nano"
-    else:
-        selected_model = "claude-haiku-4-5-20251001"
-
 summary_option = st.sidebar.selectbox(
     'Choose a summary format',
     ("100 words", "2 connecting paragraphs", "5 bullet points")
