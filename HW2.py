@@ -41,6 +41,7 @@ if st.sidebar.checkbox("Use advanced model"):
         selected_model = "gpt-5.4-mini"
     else:
         selected_model = "claude-sonnet-5"
+
 else:
     if llm_option == "OpenAI":
         selected_model = "gpt-5.4-nano"
@@ -103,6 +104,7 @@ if uploaded_url:
 
         message = client.messages.create(
             model=selected_model,
+            max_tokens=1500,
             system=system_message,
             messages=message_to_llm
         )
