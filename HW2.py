@@ -15,9 +15,6 @@ logging.basicConfig(level=logging.INFO)
 # System message for both LLMs
 system_message = "You are a helpful assistant."
 
-# Prompt for all LLMs
-prompt = "Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
-
 llm_option = st.sidebar.selectbox(
     'Choose LLM',
     ("OpenAI", "Claude")
@@ -49,6 +46,9 @@ else:
         selected_model = "gpt-5.4-nano"
     else:
         selected_model = "claude-haiku-4-5-20251001"
+
+# Prompt for all LLMs
+prompt = f"Here's a URL: {url} \n\n---\n\n Summarize the URL's contents in {summary_option}. Please respond in {language}."
 
 def read_url_content(url):
  try:
