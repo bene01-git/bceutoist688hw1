@@ -5,8 +5,9 @@ from openai import OpenAI
 st.title("IST688 HW Manager")
 
 page1 = st.Page('HW1.py', title="HW 1")
-page2 = st.Page('HW2.py', title="HW 2", default=True)
+page2 = st.Page('HW2.py', title="HW 2")
+page3 = st.Page('HW3.py', title="HW 3", default=True)
 
-pg = st.navigation([page1, page2])
+pg = st.navigation([page1, page2, page3])
 st.set_page_config(page_title="HWs")
 pg.run()
