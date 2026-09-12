@@ -74,24 +74,25 @@ if prompt := st.chat_input("What's up?"):
     recent_messages = st.session_state.messages[-6:]
 
     if llm_option == "GPT-5.6 Sol":
-        client = st.session_state.openai_client
-        api_messages = [system_prompt] + recent_messages
-        stream = client.chat.completions.create(
-            model=model_to_use,
-            messages=api_messages,
-            stream=True
-        )
+        with st.chat_message('assistant'):
+            client = st.session_state.openai_client
+            api_messages = [system_prompt] + recent_messages
+            stream = client.chat.completions.create(
+                model=model_to_use,
+                messages=api_messages,
+                stream=True
+            )
+            response = st.write_stream(stream)
     else:
-        # Anthropic already takes the system prompt as a separate parameter for us
-        client = st.session_state.anthropic_client
-        stream = client.messages.stream(
-            model=model_to_use,
-            max_tokens=1500,
-            system=system_content,
-            messages=recent_messages
-        ) 
-
-    with st.chat_message('assistant'):
-        response = st.write_stream(stream)
+        with st.chat_message('assistant'):
+            # Anthropic already takes the system prompt as a separate parameter for us
+            client = st.session_state.anthropic_client
+            stream = client.messages.stream(
+                model=model_to_use,
+                max_tokens=1500,
+                system=system_content,
+                messages=recent_messages
+            ) 
+            response = st.write_stream(stream)
 
     st.session_state.messages.append({'role': 'assistant', 'content': response})
