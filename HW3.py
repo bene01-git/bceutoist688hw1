@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 st.title("HW 3")
-st.write("This is a chatbot that will discuss up to 2 URLs. Just enter your URL(s) below to start the conversation. This chatbot utilizes a 6-message conversation memory buffer.")
+st.write("This is a chatbot that will discuss up to 2 URLs. Just enter your URL(s) on the side and ask your question about them below to start the conversation. This chatbot utilizes a 6-message conversation memory buffer.")
 
 def read_url_content(url):
  try:
@@ -51,13 +51,10 @@ if llm_option == "GPT-5.6 Sol":
 else:
    model_to_use = "claude-opus-5"
 
-if 'client' not in st.session_state:
-    if llm_option == "GPT-5.6 Sol":
-        api_key = st.secrets["OPENAI_API_KEY"]
-        st.session_state.client = OpenAI(api_key=api_key)
-    else:
-        api_key = st.secrets["ANTHROPIC_API_KEY"]
-        st.session_state.client = anthropic.Anthropic(api_key=api_key)
+if 'openai_client' not in st.session_state:
+    st.session_state.openai_client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+if 'anthropic_client' not in st.session_state:
+    st.session_state.anthropic_client = anthropic.Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
 
 if 'messages' not in st.session_state:
     st.session_state['messages'] = \
@@ -76,16 +73,17 @@ if prompt := st.chat_input("What's up?"):
     # 6-message conversation buffer (3 user-agent exchanges)
     recent_messages = st.session_state.messages[-6:]
 
-    api_messages = [system_prompt] + recent_messages
-    client = st.session_state.client
-
     if llm_option == "GPT-5.6 Sol":
+        client = st.session_state.openai_client
+        api_messages = [system_prompt] + recent_messages
         stream = client.chat.completions.create(
             model=model_to_use,
             messages=api_messages,
             stream=True
         )
     else:
+        # Anthropic already takes the system prompt as a separate parameter for us
+        client = st.session_state.anthropic_client
         stream = client.messages.stream(
             model=model_to_use,
             max_tokens=1500,
