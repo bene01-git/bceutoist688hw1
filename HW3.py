@@ -85,14 +85,17 @@ if prompt := st.chat_input("What's up?"):
             response = st.write_stream(stream)
     else:
         with st.chat_message('assistant'):
-            # Anthropic already takes the system prompt as a separate parameter for us
             client = st.session_state.anthropic_client
-            stream = client.messages.stream(
-                model=model_to_use,
-                max_tokens=1500,
-                system=system_content,
-                messages=recent_messages
-            ) 
-            response = st.write_stream(stream)
+            # Anthropic already takes the system prompt as a separate parameter for us
+            def generate_anthropic_stream():
+                with client.messages.stream(
+                    model=model_to_use,
+                    max_tokens=1500,
+                    system=system_content,
+                    messages=recent_messages
+                ) as stream:
+                    for text in stream.text_stream:
+                        yield text
+            response = st.write_stream(generate_anthropic_stream())
 
     st.session_state.messages.append({'role': 'assistant', 'content': response})
