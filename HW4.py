@@ -57,7 +57,7 @@ if 'HW4_VectorDB' not in st.session_state:
 
     # Check if collection is empty and load PDFs
     if collection.count() == 0:
-        loaded = load_htmls_to_collection('/workspaces/bceutoist688hw1/su_orgs', collection)
+        loaded = load_htmls_to_collection('/workspaces/bceutoist688hw1/su_orgs/su_orgs', collection)
 
     st.session_state.HW4_VectorDB = collection
 
