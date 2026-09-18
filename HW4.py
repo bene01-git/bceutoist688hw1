@@ -91,13 +91,21 @@ if prompt := st.chat_input("What's up?"):
     )
     query_embedding = embed_response.data[0].embedding
 
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=3 # Number of closest documents to return
-    )
+    num_docs = collection.count()
+    if num_docs > 0:
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=min(3, num_docs) # Number of closest documents to return
+        )
 
-    # Extract the retrieved text to send to the LLM
-    retrieved_context = "\n\n".join(results['documents'][0]) if results['documents'] else "No specific context found."
+        # Extract the retrieved text to send to the LLM
+        if results and results.get('documents') and len(results['documents'][0]) > 0:
+            retrieved_context = "\n\n".join(results['documents'][0])
+        else:
+            retrieved_context = "No specific context found."
+    else:
+        retrieved_context = "No specific context found."
+    
 
     system_prompt = {
         'role': 'system', 
