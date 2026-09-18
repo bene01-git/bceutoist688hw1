@@ -4,6 +4,7 @@ import sys
 import chromadb
 from pathlib import Path
 from bs4 import BeautifulSoup
+import os
 
 st.title("HW 4")
 
@@ -11,7 +12,8 @@ __import__('pysqlite3')
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Create ChromaDB client
-chroma_client = chromadb.PersistentClient(path='./ChromaDB_for_HW')
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ChromaDB_for_HW')
+chroma_client = chromadb.PersistentClient(path=db_path)
 collection = chroma_client.get_or_create_collection('HW4Collection')
 
 # Create OpenAI client
