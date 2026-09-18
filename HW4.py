@@ -11,7 +11,7 @@ __import__('pysqlite3')
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Create ChromaDB client
-chroma_client = chromadb.PersistentClient(path='/workspaces/bceutoist688hw1/ChromaDB_for_HW')
+chroma_client = chromadb.PersistentClient(path='./ChromaDB_for_HW')
 collection = chroma_client.get_or_create_collection('HW4Collection')
 
 # Create OpenAI client
@@ -52,7 +52,7 @@ def load_htmls_to_collection(folder_path, collection):
         add_to_collection(collection, chunk2, f"{html_path.name}_chunk2")
 
 if 'HW4_VectorDB' not in st.session_state:
-    chroma_client = chromadb.PersistentClient(path='/workspaces/bceutoist688hw1/ChromaDB_for_HW')
+    chroma_client = chromadb.PersistentClient(path='./ChromaDB_for_HW')
     collection = chroma_client.get_or_create_collection('HW4Collection')
 
     # Check if collection is empty and load PDFs
