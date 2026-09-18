@@ -1,3 +1,6 @@
+__import__('pysqlite3')
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import streamlit as st
 from openai import OpenAI
 import sys
@@ -7,9 +10,6 @@ from bs4 import BeautifulSoup
 import os
 
 st.title("HW 4")
-
-__import__('pysqlite3')
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Create ChromaDB client
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ChromaDB_for_HW')
