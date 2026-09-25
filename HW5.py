@@ -153,40 +153,40 @@ if prompt := st.chat_input("What's up?"):
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
 
-if tool_calls:
-        # Append the assistant's tool call message
-        api_messages.append(response_message)
-        
-        for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            function_args = json.loads(tool_call.function.arguments)
+    if tool_calls:
+            # Append the assistant's tool call message
+            api_messages.append(response_message)
             
-            if function_name == "relevant_club_info":
-                # Execute the tool using the query from the LLM
-                function_response = relevant_club_info(query=function_args.get("query"))
+            for tool_call in tool_calls:
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
                 
-                # Provide the tool response to the LLM
-                api_messages.append({
-                    "tool_call_id": tool_call.id,
-                    "role": "tool",
-                    "name": function_name,
-                    "content": function_response,
-                })
-        
-        # Second LLM call to get final response containing tool context
-        stream = client.chat.completions.create(
-            model=model_to_use,
-            messages=api_messages,
-            stream=True
-        )
-        
-        with st.chat_message('assistant'):
-            final_response = st.write_stream(stream)
+                if function_name == "relevant_club_info":
+                    # Execute the tool using the query from the LLM
+                    function_response = relevant_club_info(query=function_args.get("query"))
+                    
+                    # Provide the tool response to the LLM
+                    api_messages.append({
+                        "tool_call_id": tool_call.id,
+                        "role": "tool",
+                        "name": function_name,
+                        "content": function_response,
+                    })
             
-        st.session_state.messages.append({'role': 'assistant', 'content': final_response})
-    
-else:
-    # If no tool was called, output the standard response
-    with st.chat_message('assistant'):
-        st.markdown(response_message.content)
-    st.session_state.messages.append({'role': 'assistant', 'content': response_message.content})
+            # Second LLM call to get final response containing tool context
+            stream = client.chat.completions.create(
+                model=model_to_use,
+                messages=api_messages,
+                stream=True
+            )
+            
+            with st.chat_message('assistant'):
+                final_response = st.write_stream(stream)
+                
+            st.session_state.messages.append({'role': 'assistant', 'content': final_response})
+        
+    else:
+        # If no tool was called, output the standard response
+        with st.chat_message('assistant'):
+            st.markdown(response_message.content)
+        st.session_state.messages.append({'role': 'assistant', 'content': response_message.content})
